@@ -1,9 +1,11 @@
-package org.androidnerds.reader;
+package org.androidnerds.reader.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
 
-public class Reader extends Activity
+import org.androidnerds.reader.R;
+
+public class ReaderList extends Activity
 {
     /** Called when the activity is first created. */
     @Override
