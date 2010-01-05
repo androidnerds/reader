@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Copyright (C) 2007-2010 Michael Novak <mike@androidnerds.org>, Josh Guilfoyle <jasta@devtcg.org>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2, or (at your option) any
+ * later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ */
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+
+	<ImageView android:id="@+id/channel_icon"
+		android:layout_width="wrap_content"
+		android:layout_height="?android:attr/listPreferredItemHeight"
+		android:gravity="center_vertical"
+		android:paddingLeft="14dip"
+		/>
+		
+	<TextView android:id="@+id/channel_name"
+		android:layout_width="wrap_content"
+		android:layout_height="?android:attr/listPreferredItemHeight"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:gravity="center_vertical"
+		android:paddingLeft="8dip"
+		android:layout_weight="1"
+		android:ellipsize="end"
+        android:singleLine="true"
+		/>
+		
+	<ProgressBar android:id="@+id/channel_refresh"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:gravity="center_vertical"
+		android:padding="10px"
+		/>
+		
+	<TextView android:id="@+id/channel_post_count"
+		android:layout_width="wrap_content"
+		android:layout_height="?android:attr/listPreferredItemHeight"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:gravity="center_vertical"
+		android:paddingRight="14dip"
+		/>
+			
+</LinearLayout>
