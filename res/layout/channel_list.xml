@@ -31,7 +31,7 @@
     	android:layout_width="fill_parent" 
     	android:layout_height="wrap_content"
 		android:gravity="center"
-    	android:text="No Feed Subscriptions, please sync or add a feed from the menu."
+    	android:text="No Feeds Here."
 		android:textAppearance="?android:attr/textAppearanceMedium"
     	/>
 

@@ -149,9 +149,7 @@ public class PostListParser extends DefaultHandler {
 	}
 	
 	public void startElement(String uri, String name, String qName, Attributes attrs) { 
-		
-		Log.d(TAG, "the tag name is: " + name);
-		
+				
 		if (mId == -1 && name.equals("title") && (mState & STATE_IN_ITEM) == 0) {
 			mState |= STATE_IN_TITLE;
 		}
@@ -163,6 +161,7 @@ public class PostListParser extends DefaultHandler {
 			
 			if (state.intValue() == STATE_IN_ITEM) {
 				mPostBuf = new ChannelPost();
+				Log.d(TAG, "New Channel Post instance created.");
 			} else if ((mState & STATE_IN_ITEM) != 0 && state.intValue() == STATE_IN_ITEM_LINK) {
 				String href = attrs.getValue("href");
 				
@@ -173,12 +172,12 @@ public class PostListParser extends DefaultHandler {
 		}
 	}
 	
-	public void endElement(String uri, String name, String qName, Attributes attrs) {
+	public void endElement(String uri, String name, String qName) {
 		Integer state = mStateMap.get(name);
-		
+				
 		if (state != null) {
 			mState &= ~(state.intValue());
-			
+						
 			if (state.intValue() == STATE_IN_ITEM) {
 				
 				if (mId == -1) {
@@ -191,7 +190,7 @@ public class PostListParser extends DefaultHandler {
 			
 				Cursor dup = mContent.query(listUri, dupProj, "title=? AND url=?",
 						new String[] { mPostBuf.title, mPostBuf.link }, null);
-					
+									
 				if (dup.getCount() == 0) {
 					ContentValues values = new ContentValues();
 				
@@ -203,6 +202,7 @@ public class PostListParser extends DefaultHandler {
 					values.put(Reader.Posts.BODY, mPostBuf.desc);
 				
 					Uri added = mContent.insert(Reader.Posts.CONTENT_URI, values);
+					Log.d(TAG, "Uri of the new item: " + added);
 				}
 			
 				dup.close();
@@ -246,7 +246,7 @@ public class PostListParser extends DefaultHandler {
 		case STATE_IN_ITEM | STATE_IN_ITEM_AUTHOR:
 			mPostBuf.author = new String(ch, start, length);
 		default:
-			Log.d(TAG, "default hit parsing characters: " + new String(ch, start, length));
+			//dont care right now.
 		}
 	}
 	
