@@ -144,6 +144,9 @@ public class ReaderProvider extends ContentProvider {
 	
 	@Override
 	public String getType(Uri uri) {
+		Log.d(TAG, "Uri is " + uri);
+		Log.d(TAG, "Actual Uri is " + Reader.AUTHORITY + "channels");
+		
 		switch (URI_MATCHER.match(uri)) {
 		case CHANNELS:
 			return "vnd.android.cursor.dir/vnd.reader.channel";

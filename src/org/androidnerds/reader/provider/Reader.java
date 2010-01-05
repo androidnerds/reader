@@ -18,7 +18,7 @@ import android.provider.BaseColumns;
 
 public final class Reader {
 	
-	public static final String AUTHORITY = "org.androidnerds.reader";
+	public static final String AUTHORITY = "org.androidnerds.reader.provider.Reader";
 	
 	public interface Channels extends BaseColumns {
 		

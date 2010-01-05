@@ -150,7 +150,9 @@ public class PostListParser extends DefaultHandler {
 	
 	public void startElement(String uri, String name, String qName, Attributes attrs) { 
 		
-		if (mId == -1 && name.equals("name") && (mState & STATE_IN_ITEM) == 0) {
+		Log.d(TAG, "the tag name is: " + name);
+		
+		if (mId == -1 && name.equals("title") && (mState & STATE_IN_ITEM) == 0) {
 			mState |= STATE_IN_TITLE;
 		}
 		
@@ -177,36 +179,39 @@ public class PostListParser extends DefaultHandler {
 		if (state != null) {
 			mState &= ~(state.intValue());
 			
-			if (mId == -1) {
-				Log.d(TAG, "found an item before the end of the title tag, fix parser.");
-				return;
-			}
+			if (state.intValue() == STATE_IN_ITEM) {
+				
+				if (mId == -1) {
+					Log.d(TAG, "found an item before the end of the title tag, fix parser.");
+					return;
+				}
 			
-			String[] dupProj = new String[] { Reader.Posts._ID };
-			Uri listUri = ContentUris.withAppendedId(Reader.Posts.CONTENT_URI_LIST, mId);
+				String[] dupProj = new String[] { Reader.Posts._ID };
+				Uri listUri = ContentUris.withAppendedId(Reader.Posts.CONTENT_URI_LIST, mId);
 			
-			Cursor dup = mContent.query(listUri, dupProj, "title=? AND url=?",
-					new String[] { mPostBuf.title, mPostBuf.link }, null);
+				Cursor dup = mContent.query(listUri, dupProj, "title=? AND url=?",
+						new String[] { mPostBuf.title, mPostBuf.link }, null);
 					
-			if (dup.getCount() == 0) {
-				ContentValues values = new ContentValues();
+				if (dup.getCount() == 0) {
+					ContentValues values = new ContentValues();
 				
-				values.put(Reader.Posts.CHANNEL_ID, mId);
-				values.put(Reader.Posts.TITLE, mPostBuf.title);
-				values.put(Reader.Posts.URL, mPostBuf.link);
-				values.put(Reader.Posts.AUTHOR, mPostBuf.author);
-				values.put(Reader.Posts.DATE, mPostBuf.getDate());
-				values.put(Reader.Posts.BODY, mPostBuf.desc);
+					values.put(Reader.Posts.CHANNEL_ID, mId);
+					values.put(Reader.Posts.TITLE, mPostBuf.title);
+					values.put(Reader.Posts.URL, mPostBuf.link);
+					values.put(Reader.Posts.AUTHOR, mPostBuf.author);
+					values.put(Reader.Posts.DATE, mPostBuf.getDate());
+					values.put(Reader.Posts.BODY, mPostBuf.desc);
 				
-				Uri added = mContent.insert(Reader.Posts.CONTENT_URI, values);
-			}
+					Uri added = mContent.insert(Reader.Posts.CONTENT_URI, values);
+				}
 			
-			dup.close();
+				dup.close();
+			}
 		}
 	}
 	
 	public void characters(char ch[], int start, int length) {
-		if (mId == -1 && (mState & STATE_IN_TITLE) == 0) {
+		if (mId == -1 && (mState & STATE_IN_TITLE) != 0) {
 			ContentValues values = new ContentValues();
 			
 			values.put(Reader.Channels.TITLE, new String(ch, start, length));
@@ -225,7 +230,7 @@ public class PostListParser extends DefaultHandler {
 			return;
 		}
 		
-		switch(mState) {
+		switch (mState) {
 		case STATE_IN_ITEM | STATE_IN_ITEM_TITLE:
 			mPostBuf.title = new String(ch, start, length);
 			break;
