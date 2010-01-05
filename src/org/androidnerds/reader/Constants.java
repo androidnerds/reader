@@ -28,4 +28,5 @@ public interface Constants {
 	 * build information in it
 	 */
 	public static boolean PRE_ECLAIR = (Integer.parseInt(Build.VERSION.SDK) <= 4);
+	
 }
