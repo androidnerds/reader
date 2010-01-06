@@ -62,6 +62,14 @@
             </intent-filter>
 		</activity>
 		
+		<activity android:name=".activity.PostView" android:label="@string/app_name">
+        	<intent-filter android:label="View Post">
+        		<action android:name="android.intent.action.VIEW" />
+        		<category android:name="android.intent.category.DEFAULT" />
+        		<data android:mimeType="vnd.android.cursor.item/vnd.reader.post" />
+        	</intent-filter>
+        </activity>
+		
 		<activity android:name=".activity.AccountActivity" android:label="Account Setup" />
 		
     </application>

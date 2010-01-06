@@ -101,6 +101,13 @@ public class PostList extends ListActivity {
 		setListAdapter(adapter);
 	}
 	
+	@Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+		Uri uri = ContentUris.withAppendedId(Reader.Posts.CONTENT_URI, id);
+		
+    	startActivity(new Intent(Intent.ACTION_VIEW, uri));
+    }
+
 	private void showMultiPanel(boolean show) {
         if (show && mMultiSelectPanel.getVisibility() != View.VISIBLE) {
             mMultiSelectPanel.setVisibility(View.VISIBLE);

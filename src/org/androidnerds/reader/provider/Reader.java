@@ -50,13 +50,19 @@ public final class Reader {
 		 */
 		public static final String LOGO = "logo";
 		
+		/**
+		 * This field determines if the item in the database needs to sync with Google Reader
+		 */
+		public static final String SYNC = "sync";
+		
 		public static final class SQL {
 			
 			public static final String TABLE = "channels";
 			
 			public static final String CREATE = "CREATE TABLE " + TABLE 
 				+ " (_id INTEGER PRIMARY KEY, " + TITLE + " TEXT UNIQUE, " + URL + " TEXT UNIQUE, "
-				+ ICON + " TEXT, " + ICON_URL + " TEXT, " + LOGO + " TEXT);";
+				+ ICON + " TEXT, " + ICON_URL + " TEXT, " + LOGO + " TEXT, "
+				+ SYNC + " INTEGER(1) DEFAULT '0');";
 				
 			public static final String DROP = "DROP TABLE IF EXISTS " + TABLE;
 		}
@@ -88,6 +94,11 @@ public final class Reader {
 		public static final String READ = "read";
 		
 		/**
+		 *
+		 */
+		public static final String STARRED = "starred";
+		
+		/**
 		 * The post subject.
 		 */
 		public static final String TITLE = "title";
@@ -112,6 +123,11 @@ public final class Reader {
 		 */
 		public static final String DATE = "posted_on";
 		
+		/**
+		 * This field determines if the item needs to sync with Google Reader
+		 */
+		public static final String SYNC = "sync";
+		
 		public static final class SQL {
 			
 			public static final String TABLE = "posts";
@@ -119,11 +135,13 @@ public final class Reader {
 			public static final String CREATE = "CREATE TABLE " + TABLE
 				+ " (_id INTEGER PRIMARY KEY, " + CHANNEL_ID + " INTEGER, " + TITLE
 				+ " TEXT, " + URL + " TEXT, " + DATE + " DATETIME, " + BODY + " TEXT, " 
-				+ AUTHOR + " TEXT, " + READ + " INTEGER(1) DEFAULT '0');";
+				+ AUTHOR + " TEXT, " + READ + " INTEGER(1) DEFAULT '0', " 
+				+ STARRED + " INTEGER(1) DEFAULT '0', " + SYNC + " INTEGER(1) DEFAULT '0');";
 			
 			public static final String[] INDEX  = new String[] {
 				"CREATE UNIQUE INDEX unq_post ON " + TABLE + " (" + TITLE + ", " + URL + ");",
-				"CREATE INDEX idx_channel ON " + TABLE + " (" + CHANNEL_ID + ");"
+				"CREATE INDEX idx_channel ON " + TABLE + " (" + CHANNEL_ID + ");",
+				"CREATE INDEX idx_starred ON " + TABLE + " (" + STARRED + ");"
 			};
 			
 			public static final String DROP = "DROP TABLE IF EXISTS " + TABLE;

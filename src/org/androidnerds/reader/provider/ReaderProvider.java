@@ -44,7 +44,7 @@ public class ReaderProvider extends ContentProvider {
 	
 	private static final String TAG = "ReaderProvider";
 	private static final String DATABASE_NAME = "reader.db";
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 	
 	private DatabaseHelper mHelper;
 	
@@ -85,7 +85,20 @@ public class ReaderProvider extends ContentProvider {
 		
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			//nothing to upgrade yet. yay!
+			switch (oldVersion) {
+			case 1:
+				db.execSQL("ALTER TABLE " + Reader.Channels.SQL.TABLE + " ADD COLUMN "
+						+ Reader.Channels.SYNC + " INTEGER(1) DEFAULT '0';");
+				db.execSQL("ALTER TABLE " + Reader.Posts.SQL.TABLE + " ADD COLUMN "
+						+ Reader.Posts.SYNC + " INTEGER(1) DEFAULT '0';");
+				db.execSQL("ALTER TABLE " + Reader.Posts.SQL.TABLE + " ADD COLUMN "
+						+ Reader.Posts.STARRED + " INTEGER(1) DEFAULT '0';");
+				break;
+			default:
+				onDrop(db);
+				onCreate(db);
+				break;
+			}
 		}
 	}
 	
@@ -329,17 +342,21 @@ public class ReaderProvider extends ContentProvider {
 		
 		switch (URI_MATCHER.match(uri)) {
 		case CHANNELS:
+			values.put(Reader.Channels.SYNC, 1);
 			count = db.update(Reader.Channels.SQL.TABLE, values, where, whereArgs);
 			break;
 		case CHANNEL_ID:
+			values.put(Reader.Channels.SYNC, 1);
 			where = "_id=" + uri.getPathSegments().get(1) +
 				(!TextUtils.isEmpty(where) ? " AND (" + where + ")" : "");
 			count = db.update(Reader.Channels.SQL.TABLE, values, where, whereArgs);
 			break;
 		case POSTS:
+			values.put(Reader.Posts.SYNC, 1);
 			count = db.update(Reader.Posts.SQL.TABLE, values, where, whereArgs);
 			break;
 		case POST_ID:
+			values.put(Reader.Posts.SYNC, 1);
 			where = "_id=" + uri.getPathSegments().get(1) +
 				(!TextUtils.isEmpty(where) ? " AND (" + where + ")" : "");
 			count = db.update(Reader.Posts.SQL.TABLE, values, where, whereArgs);
@@ -367,6 +384,7 @@ public class ReaderProvider extends ContentProvider {
 		CHANNEL_LIST_PROJECTION_MAP.put(Reader.Channels.URL, "url");
 		CHANNEL_LIST_PROJECTION_MAP.put(Reader.Channels.ICON, "icon");
 		CHANNEL_LIST_PROJECTION_MAP.put(Reader.Channels.LOGO, "logo");
+		CHANNEL_LIST_PROJECTION_MAP.put(Reader.Channels.SYNC, "sync");
 		
 		POST_LIST_PROJECTION_MAP = new HashMap<String, String>();
 		POST_LIST_PROJECTION_MAP.put(Reader.Posts._ID, "_id");
@@ -377,5 +395,7 @@ public class ReaderProvider extends ContentProvider {
 		POST_LIST_PROJECTION_MAP.put(Reader.Posts.AUTHOR, "author");
 		POST_LIST_PROJECTION_MAP.put(Reader.Posts.DATE, "posted_on");
 		POST_LIST_PROJECTION_MAP.put(Reader.Posts.BODY, "body");
+		POST_LIST_PROJECTION_MAP.put(Reader.Posts.STARRED, "starred");
+		POST_LIST_PROJECTION_MAP.put(Reader.Posts.SYNC, "sync");
 	}
 }
