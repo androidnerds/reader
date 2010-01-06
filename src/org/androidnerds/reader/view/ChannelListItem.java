@@ -15,6 +15,7 @@ package org.androidnerds.reader.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.RelativeLayout;
 
@@ -38,6 +39,7 @@ public class ChannelListItem extends RelativeLayout {
 	public boolean mFavorite;
 	public boolean mSelected;
 	public boolean mRead;
+	public long mChannelId;
 	
 	public ChannelListItem(Context context) {
 		super(context);
@@ -87,6 +89,7 @@ public class ChannelListItem extends RelativeLayout {
 			if (mDownEvent) {
 				if (mAllowBatch && touchX < mCheckRight) {
 					mSelected = !mSelected;
+					Log.d(TAG, "Which view: " + mChannelId);
 					mAdapter.updateSelected(this, mSelected);
 					handled = true;
 				} else if (touchX > mStarLeft) {

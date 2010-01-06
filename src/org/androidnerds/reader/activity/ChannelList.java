@@ -23,11 +23,13 @@ import android.database.Cursor;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.Filterable;
@@ -40,6 +42,8 @@ import org.androidnerds.reader.provider.Reader;
 import org.androidnerds.reader.view.ChannelListItem;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ChannelList extends ListActivity {
 	
@@ -54,10 +58,13 @@ public class ChannelList extends ListActivity {
 	};
 	
 	private Cursor mCursor;
+	private View mMultiSelectPanel;
 	
 	private static final int[] mColorChipResIds = new int[] {
         R.drawable.appointment_indicator_leftside_1,
         R.drawable.appointment_indicator_leftside_5,
+		R.drawable.appointment_indicator_leftside_16,
+		R.drawable.appointment_indicator_leftside_19,
     };
 
     /** Called when the activity is first created. */
@@ -67,6 +74,8 @@ public class ChannelList extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.channel_list);
 
+		mMultiSelectPanel = findViewById(R.id.footer_organize);
+		
 		Intent intent = getIntent();
 		
 		if (intent.getData() == null) {
@@ -108,7 +117,23 @@ public class ChannelList extends ListActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	public static class ChannelListAdapter extends CursorAdapter implements Filterable {
+    private void showMultiPanel(boolean show) {
+        if (show && mMultiSelectPanel.getVisibility() != View.VISIBLE) {
+            mMultiSelectPanel.setVisibility(View.VISIBLE);
+            mMultiSelectPanel.startAnimation(
+                    AnimationUtils.loadAnimation(this, R.anim.footer_appear));
+        } else if (!show && mMultiSelectPanel.getVisibility() != View.GONE) {
+            mMultiSelectPanel.setVisibility(View.GONE);
+            mMultiSelectPanel.startAnimation(
+                        AnimationUtils.loadAnimation(this, R.anim.footer_disappear));
+        }
+
+        if (show) {
+            //updateFooterButtonNames();
+        }
+    }
+
+	public class ChannelListAdapter extends CursorAdapter implements Filterable {
 		
 		private HashMap<Long, ChannelListItem> itemMap;
 		private LayoutInflater mInflater;
@@ -118,6 +143,8 @@ public class ChannelList extends ListActivity {
         private Drawable mSelectedIconOn;
         private Drawable mSelectedIconOff;
 
+		private HashSet<Long> mChecked = new HashSet<Long>();
+		
 		public ChannelListAdapter(Context context, Cursor cur) {
 			super(context, cur);
 			itemMap = new HashMap<Long, ChannelListItem>();
@@ -138,13 +165,21 @@ public class ChannelList extends ListActivity {
 			itemMap.put(new Long(channelId), item);
 		}
 		
+		public Set<Long> getSelectedSet() {
+            return mChecked;
+        }
+
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
 			ChannelListItem item = (ChannelListItem) view;
 			item.bindViewInit(this, true);
 			
 			long channelId = cursor.getLong(cursor.getColumnIndex(Reader.Channels._ID));
-
+			item.mChannelId = channelId;
+			Log.d(TAG, "Channel ID: " + channelId);
+			Log.d(TAG, "ChannelItem ID: " + item.mChannelId);
+			item.mSelected = mChecked.contains(Long.valueOf(item.mChannelId));
+			
 			ContentResolver resolver = context.getContentResolver();
 			Cursor unread = resolver.query(ContentUris.withAppendedId(Reader.Posts.CONTENT_URI_LIST, 
 					channelId), new String[] { Reader.Posts._ID }, "read=0", null, null);
@@ -173,6 +208,8 @@ public class ChannelList extends ListActivity {
 				postCount.setTypeface(Typeface.DEFAULT);
 				view.setBackgroundDrawable(context.getResources().getDrawable(
                         R.drawable.list_item_background_read));
+				chipResId = mColorChipResIds[3];
+				chipView.setBackgroundResource(chipResId);
 			} else {
 				titleView.setTypeface(Typeface.DEFAULT_BOLD);
 				lastPostView.setTypeface(Typeface.DEFAULT_BOLD);
@@ -200,11 +237,24 @@ public class ChannelList extends ListActivity {
 		}
 		
 		public void updateSelected(ChannelListItem item, boolean newSelected) {
-			
+			ImageView selectedView = (ImageView) item.findViewById(R.id.selected);
+            selectedView.setImageDrawable(newSelected ? mSelectedIconOn : mSelectedIconOff);
+
+            // Set checkbox state in list, and show/hide panel if necessary
+            Long id = Long.valueOf(item.mChannelId);
+            if (newSelected) {
+                mChecked.add(id);
+            } else {
+                mChecked.remove(id);
+            }
+
+            ChannelList.this.showMultiPanel(mChecked.size() > 0);
 		}
 		
 		public void updateFavorite(ChannelListItem item, boolean newFavorite) {
-			
+			ImageView favoriteView = (ImageView) item.findViewById(R.id.favorite);
+            favoriteView.setImageDrawable(newFavorite ? mFavoriteIconOn : mFavoriteIconOff);
+            //onSetMessageFavorite(item.mId, newFavorite);
 		}
 	}
 }

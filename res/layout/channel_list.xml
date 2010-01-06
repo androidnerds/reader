@@ -25,7 +25,40 @@
 		android:layout_height="fill_parent"
 		android:layout_weight="1"
 		/>
-		
+	
+		<LinearLayout android:id="@+id/footer_organize"
+	        android:orientation="horizontal"
+	        android:visibility="gone"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:paddingTop="5dip"
+	        android:paddingLeft="4dip"
+	        android:paddingRight="4dip"
+	        android:paddingBottom="1dip"
+	        android:background="@android:drawable/bottom_bar">
+
+	        <Button
+	            android:id="@+id/btn_read_unread"
+	            android:layout_width="0dip"
+	            android:layout_height="fill_parent"
+	            android:layout_weight="1"
+	            android:text="Mark Read" />
+
+	        <Button
+	            android:id="@+id/btn_multi_favorite"
+	            android:layout_width="0dip"
+	            android:layout_height="fill_parent"
+	            android:layout_weight="1"
+	            android:text="Star It" />
+
+	        <Button android:id="@+id/btn_multi_delete"
+	            android:layout_width="0dip"
+	            android:layout_height="fill_parent"
+	            android:layout_weight="1"
+	            android:text="Delete" />
+
+	    </LinearLayout>
+	
 	<TextView
 		android:id="@android:id/empty"  
     	android:layout_width="fill_parent" 

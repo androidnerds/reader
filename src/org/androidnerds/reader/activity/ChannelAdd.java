@@ -53,6 +53,7 @@ public class ChannelAdd extends Activity {
 		mUrlText = (EditText) findViewById(R.id.url_edit);
 		
 		Button add = (Button) findViewById(R.id.feed_add);
+		
 		add.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				addChannel();
