@@ -25,6 +25,7 @@
 	
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.VIBRATE" />
+	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
 	
     <application android:label="@string/app_name" android:icon="@drawable/icon">
 		<provider android:name=".provider.ReaderProvider"
@@ -52,6 +53,8 @@
                 <data android:mimeType="vnd.android.cursor.dir/vnd.reader.channel" />
             </intent-filter>
 		</activity>
+		
+		<activity android:name=".activity.AccountActivity" android:label="Account Setup" />
 		
     </application>
 </manifest> 

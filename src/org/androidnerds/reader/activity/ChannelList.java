@@ -35,6 +35,7 @@ import java.util.HashMap;
 public class ChannelList extends ListActivity {
 	
 	public static final int INSERT_ID = Menu.FIRST;
+	public static final int ACCOUNT_ID = Menu.FIRST + 1;
 	
 	private static final String TAG = "ReaderList";
 	private static final String PREFS = "readerprefs";
@@ -74,7 +75,9 @@ public class ChannelList extends ListActivity {
 		
 		menu.add(0, INSERT_ID, 0, "New Feed").setIcon(android.R.drawable.ic_menu_add)
 				.setShortcut('3', 'a');
-				
+		
+		menu.add(0, ACCOUNT_ID, 0, "Account").setIcon(R.drawable.ic_menu_account_list);
+		
 		return true;
 	}
 	
@@ -84,6 +87,8 @@ public class ChannelList extends ListActivity {
 		case INSERT_ID:
 			startActivity(new Intent(Intent.ACTION_INSERT, getIntent().getData()));
 			return true;
+		case ACCOUNT_ID:
+			startActivity(new Intent(this, AccountActivity.class));
 		}
 		
 		return super.onOptionsItemSelected(item);
