@@ -46,6 +46,14 @@
 			</intent-filter>
         </activity>
 
+		<activity android:name=".activity.PostList" android:label="@string/app_name">
+        	<intent-filter android:label="View Posts">
+        		<action android:name="android.intent.action.VIEW" />
+        		<category android:name="android.intent.category.DEFAULT" />
+        		<data android:mimeType="vnd.android.cursor.dir/vnd.reader.post" />
+        	</intent-filter>
+        </activity>
+
 		<activity android:name=".activity.ChannelAdd" android:label="New Feed">
 			<intent-filter android:label="New Channel">
                 <action android:name="android.intent.action.INSERT" />

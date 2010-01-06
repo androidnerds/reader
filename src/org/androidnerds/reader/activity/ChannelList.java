@@ -22,6 +22,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,12 +36,18 @@ import android.widget.CursorAdapter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.androidnerds.reader.R;
 import org.androidnerds.reader.provider.Reader;
 import org.androidnerds.reader.view.ChannelListItem;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -50,7 +57,7 @@ public class ChannelList extends ListActivity {
 	public static final int INSERT_ID = Menu.FIRST;
 	public static final int ACCOUNT_ID = Menu.FIRST + 1;
 	
-	private static final String TAG = "ReaderList";
+	private static final String TAG = "ChannelList";
 	private static final String PREFS = "readerprefs";
 	
 	private static final String[] PROJECTION = new String[] {
@@ -66,6 +73,19 @@ public class ChannelList extends ListActivity {
 		R.drawable.appointment_indicator_leftside_16,
 		R.drawable.appointment_indicator_leftside_19,
     };
+
+	private static final SimpleDateFormat mDateFmtDB;
+	private static final SimpleDateFormat mDateFmtToday;
+	private static final SimpleDateFormat mDateFmt;
+
+	static
+	{
+		mDateFmtDB = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+		mDateFmtToday = new SimpleDateFormat("h:mma");
+
+		/* TODO: Format date according to the current locale preference. */
+		mDateFmt = new SimpleDateFormat("MM/dd/yyyy");
+	}
 
     /** Called when the activity is first created. */
     @Override
@@ -117,6 +137,25 @@ public class ChannelList extends ListActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
+	@Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+		String action = getIntent().getAction();
+
+    	if (action.equals(Intent.ACTION_PICK) || action.equals(Intent.ACTION_GET_CONTENT)) {
+    		Uri uri = ContentUris.withAppendedId(getIntent().getData(), id);
+    		
+			Log.d(TAG, "List Item Id: " + id);
+			
+    		Intent intent = getIntent();
+    		intent.setData(uri);
+    		setResult(RESULT_OK, intent);
+    	} else {
+    		Uri uri = ContentUris.withAppendedId(Reader.Posts.CONTENT_URI_LIST, id);
+    		
+    		startActivity(new Intent(Intent.ACTION_VIEW, uri));
+    	}
+	}
+	
     private void showMultiPanel(boolean show) {
         if (show && mMultiSelectPanel.getVisibility() != View.VISIBLE) {
             mMultiSelectPanel.setVisibility(View.VISIBLE);
@@ -186,7 +225,41 @@ public class ChannelList extends ListActivity {
 			
 			int unreadCount = unread.getCount();
 			unread.close();
-						
+			
+			Cursor lastPost = resolver.query(ContentUris.withAppendedId(Reader.Posts.CONTENT_URI_LIST,
+					channelId), new String[] { Reader.Posts.DATE }, null, null, "posted_on DESC LIMIT 1");
+					
+			String strdate = "";
+			String formattedDate = "";
+			
+			if (lastPost.moveToNext()) {
+				strdate = lastPost.getString(lastPost.getColumnIndex(Reader.Posts.DATE));
+			}	
+			
+			lastPost.close();
+			
+			if (!strdate.equals("")) {
+				try {
+					Date date = mDateFmtDB.parse(strdate);
+
+					Calendar then = new GregorianCalendar();
+					then.setTime(date);
+
+					Calendar now = new GregorianCalendar();
+
+					SimpleDateFormat fmt;
+
+					if (now.get(Calendar.DAY_OF_YEAR) == then.get(Calendar.DAY_OF_YEAR))
+						fmt = mDateFmtToday;
+					else
+						fmt = mDateFmt;
+
+					formattedDate = fmt.format(date);
+				} catch (ParseException e) {
+					Log.d(TAG, "Exception caught:: " + e.toString());
+				}
+			}
+			
 			View chipView = view.findViewById(R.id.chip);
 			int chipResId = mColorChipResIds[0];
 			chipView.setBackgroundResource(chipResId);
@@ -196,7 +269,7 @@ public class ChannelList extends ListActivity {
 			titleView.setText(text);
 			
 			TextView lastPostView = (TextView) view.findViewById(R.id.channel_last_post);
-			text = "Last post on: ";
+			text = "Last post: " + formattedDate;
 			lastPostView.setText(text);
 			
 			TextView postCount = (TextView) view.findViewById(R.id.channel_post_count);

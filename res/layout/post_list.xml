@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Copyright (C) 2007-2010 Michael Novak <mike@androidnerds.org>, Josh Guilfoyle <jasta@devtcg.org>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2, or (at your option) any
+ * later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ */
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+
+	<ListView android:id="@android:id/list"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:layout_weight="1"
+		/>
+	
+		<LinearLayout android:id="@+id/post_footer_organize"
+	        android:orientation="horizontal"
+	        android:visibility="gone"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:paddingTop="5dip"
+	        android:paddingLeft="4dip"
+	        android:paddingRight="4dip"
+	        android:paddingBottom="1dip"
+	        android:background="@android:drawable/bottom_bar">
+
+	        <Button
+	            android:id="@+id/btn_read_unread_post"
+	            android:layout_width="0dip"
+	            android:layout_height="fill_parent"
+	            android:layout_weight="1"
+	            android:text="Mark Read" />
+
+	        <Button
+	            android:id="@+id/btn_multi_favorite_post"
+	            android:layout_width="0dip"
+	            android:layout_height="fill_parent"
+	            android:layout_weight="1"
+	            android:text="Star It" />
+
+	        <Button android:id="@+id/btn_multi_delete_post"
+	            android:layout_width="0dip"
+	            android:layout_height="fill_parent"
+	            android:layout_weight="1"
+	            android:text="Delete" />
+
+	    </LinearLayout>
+	
+	<TextView
+		android:id="@android:id/empty"  
+    	android:layout_width="fill_parent" 
+    	android:layout_height="fill_parent"
+		android:gravity="center"
+    	android:text="No Posts Here."
+		android:textAppearance="?android:attr/textAppearanceMedium"
+    	/>
+
+</LinearLayout>
