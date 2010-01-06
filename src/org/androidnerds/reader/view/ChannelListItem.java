@@ -32,11 +32,9 @@ public class ChannelListItem extends RelativeLayout {
 	
 	private boolean mDownEvent;
 	private int mCheckRight;
-	private int mStarLeft;
 	
 	private static final float CLICKABLE_PAD = 10.0f;
 	
-	public boolean mFavorite;
 	public boolean mSelected;
 	public boolean mRead;
 	public long mChannelId;
@@ -68,7 +66,6 @@ public class ChannelListItem extends RelativeLayout {
 			float paddingScale = getContext().getResources().getDisplayMetrics().density;
 			int clickPadding = (int) ((CLICKABLE_PAD * paddingScale) + 0.5);
 			mCheckRight = findViewById(R.id.selected).getRight() + clickPadding;
-			mStarLeft = findViewById(R.id.favorite).getLeft() - clickPadding;
 			
 			mCachedViewPositions = true;
 		}
@@ -77,7 +74,7 @@ public class ChannelListItem extends RelativeLayout {
 		case MotionEvent.ACTION_DOWN:
 			mDownEvent = true;
 			
-			if ((mAllowBatch && touchX < mCheckRight) || touchX > mStarLeft) {
+			if ((mAllowBatch && touchX < mCheckRight)) {
 				handled = true;
 			}
 			
@@ -91,10 +88,6 @@ public class ChannelListItem extends RelativeLayout {
 					mSelected = !mSelected;
 					Log.d(TAG, "Which view: " + mChannelId);
 					mAdapter.updateSelected(this, mSelected);
-					handled = true;
-				} else if (touchX > mStarLeft) {
-					mFavorite = !mFavorite;
-					mAdapter.updateFavorite(this, mFavorite);
 					handled = true;
 				}
 			}

@@ -244,6 +244,7 @@ public class PostList extends ListActivity {
             ImageView favoriteView = (ImageView) view.findViewById(R.id.favorite_post);
             favoriteView.setImageDrawable(item.mFavorite ? mFavoriteIconOn : mFavoriteIconOff);
 
+			Log.d(TAG, "Some really weird caching stuff going on here.");
 			updateItemMap(cursor, item);
 		}
 		

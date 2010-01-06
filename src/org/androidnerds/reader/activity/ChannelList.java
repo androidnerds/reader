@@ -176,9 +176,6 @@ public class ChannelList extends ListActivity {
 		
 		private HashMap<Long, ChannelListItem> itemMap;
 		private LayoutInflater mInflater;
-		private Drawable mAttachmentIcon;
-        private Drawable mFavoriteIconOn;
-        private Drawable mFavoriteIconOff;
         private Drawable mSelectedIconOn;
         private Drawable mSelectedIconOff;
 
@@ -191,8 +188,6 @@ public class ChannelList extends ListActivity {
 			mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 			Resources resources = context.getResources();
-			mFavoriteIconOn = resources.getDrawable(R.drawable.btn_star_big_buttonless_dark_on);
-	        mFavoriteIconOff = resources.getDrawable(R.drawable.btn_star_big_buttonless_dark_off);
 	        mSelectedIconOn = resources.getDrawable(R.drawable.btn_check_buttonless_dark_on);
 	        mSelectedIconOff = resources.getDrawable(R.drawable.btn_check_buttonless_dark_off);
 
@@ -294,9 +289,6 @@ public class ChannelList extends ListActivity {
 			ImageView selectedView = (ImageView) view.findViewById(R.id.selected);
             selectedView.setImageDrawable(item.mSelected ? mSelectedIconOn : mSelectedIconOff);
 
-            ImageView favoriteView = (ImageView) view.findViewById(R.id.favorite);
-            favoriteView.setImageDrawable(item.mFavorite ? mFavoriteIconOn : mFavoriteIconOff);
-
 			updateItemMap(cursor, item);
 		}
 		
@@ -322,12 +314,6 @@ public class ChannelList extends ListActivity {
             }
 
             ChannelList.this.showMultiPanel(mChecked.size() > 0);
-		}
-		
-		public void updateFavorite(ChannelListItem item, boolean newFavorite) {
-			ImageView favoriteView = (ImageView) item.findViewById(R.id.favorite);
-            favoriteView.setImageDrawable(newFavorite ? mFavoriteIconOn : mFavoriteIconOff);
-            //onSetMessageFavorite(item.mId, newFavorite);
 		}
 	}
 }
