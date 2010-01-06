@@ -16,6 +16,7 @@ package org.androidnerds.reader.activity;
 import android.app.ListActivity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -59,7 +60,7 @@ public class PostList extends ListActivity {
 	
 	private static final String[] PROJECTION = new String[] {
 		Reader.Posts._ID, Reader.Posts.CHANNEL_ID, Reader.Posts.TITLE, Reader.Posts.READ,
-				Reader.Posts.DATE, Reader.Posts.AUTHOR };
+				Reader.Posts.DATE, Reader.Posts.AUTHOR, Reader.Posts.STARRED };
 	
 	private Cursor mCursor;
 	private long mId;
@@ -124,6 +125,13 @@ public class PostList extends ListActivity {
         }
     }
 
+	private void onSetMessageFavorite(long postId, boolean newFavorite) {
+		Uri uri = ContentUris.withAppendedId(Reader.Posts.CONTENT_URI, postId);
+        ContentValues values = new ContentValues();
+		values.put(Reader.Posts.STARRED, 1);
+		getContentResolver().update(uri, values, null, null);
+    }
+
 	public class PostListAdapter extends CursorAdapter implements Filterable {
 		
 		private HashMap<Long, PostListItem> itemMap;
@@ -168,7 +176,15 @@ public class PostList extends ListActivity {
 			item.mPostId = postId;
 
 			item.mSelected = mChecked.contains(Long.valueOf(item.mPostId));
-						
+
+			int starred = cursor.getInt(cursor.getColumnIndex(Reader.Posts.STARRED));
+			
+			if (starred == 0) {
+				item.mFavorite = false;
+			} else {
+				item.mFavorite = true;
+			}
+			
 			View chipView = view.findViewById(R.id.chip);
 			int chipResId = mColorChipResIds[0];
 			chipView.setBackgroundResource(chipResId);
@@ -258,7 +274,7 @@ public class PostList extends ListActivity {
 		public void updateFavorite(PostListItem item, boolean newFavorite) {
 			ImageView favoriteView = (ImageView) item.findViewById(R.id.favorite_post);
             favoriteView.setImageDrawable(newFavorite ? mFavoriteIconOn : mFavoriteIconOff);
-            //onSetMessageFavorite(item.mId, newFavorite);
+            onSetMessageFavorite(item.mPostId, newFavorite);
 		}
 	}
 }
