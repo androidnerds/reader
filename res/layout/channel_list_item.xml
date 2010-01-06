@@ -14,43 +14,69 @@
  * General Public License for more details.
  */
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+<org.androidnerds.reader.view.ChannelListItem xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+	android:paddingRight="10dip"
     >
+	
+	<View
+        android:id="@+id/chip"
+        android:background="@drawable/appointment_indicator_leftside_1"
+        android:layout_width="4dip"
+        android:layout_height="fill_parent"
+        android:layout_centerVertical="true" />
 
-	<ImageView android:id="@+id/channel_icon"
-		android:layout_width="wrap_content"
-		android:layout_height="?android:attr/listPreferredItemHeight"
-		android:gravity="center_vertical"
-		android:paddingLeft="14dip"
-		/>
-		
-	<TextView android:id="@+id/channel_name"
-		android:layout_width="wrap_content"
-		android:layout_height="?android:attr/listPreferredItemHeight"
-		android:textAppearance="?android:attr/textAppearanceMedium"
-		android:gravity="center_vertical"
-		android:paddingLeft="8dip"
-		android:layout_weight="1"
-		android:ellipsize="end"
-        android:singleLine="true"
-		/>
-		
-	<ProgressBar android:id="@+id/channel_refresh"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:gravity="center_vertical"
-		android:padding="10px"
-		/>
-		
-	<TextView android:id="@+id/channel_post_count"
-		android:layout_width="wrap_content"
-		android:layout_height="?android:attr/listPreferredItemHeight"
-		android:textAppearance="?android:attr/textAppearanceMedium"
-		android:gravity="center_vertical"
-		android:paddingRight="14dip"
-		/>
+	<ImageView
+        android:id="@+id/selected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/chip"
+        android:paddingTop="10dip"
+        android:paddingLeft="4dip"
+        android:src="@drawable/btn_check_buttonless_dark_off" />
+
+	<ImageView
+	    android:id="@+id/favorite"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentRight="true"
+	    android:paddingTop="10dip"
+	    android:src="@android:drawable/star_off" />
+	
+	<TextView
+	    android:id="@+id/channel_name"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_toRightOf="@id/selected"
+	    android:layout_toLeftOf="@id/favorite"
+	    android:ellipsize="end"
+	    android:singleLine="true"
+	    android:textAppearance="?android:attr/textAppearanceMedium"
+	    android:paddingLeft="10dip"
+	    android:drawablePadding="4dip"
+	    android:paddingTop="12dip" />
+				
+	<TextView
+	    android:id="@+id/channel_last_post"
+	    android:ellipsize="end"
+	    android:singleLine="true"
+	    android:textAppearance="?android:attr/textAppearanceSmall"
+	    android:layout_width="0dip"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@id/channel_name"
+	    android:layout_alignLeft="@id/channel_name"
+	    android:paddingLeft="10dip"
+	    android:layout_marginRight="6dip" />
+	
+	<TextView
+	    android:id="@+id/channel_post_count"
+	    android:ellipsize="end"
+	    android:singleLine="true"
+	    android:textAppearance="?android:attr/textAppearanceSmall"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentRight="true"
+	    android:layout_alignBaseline="@+id/channel_last_post" />
 			
-</LinearLayout>
+</org.androidnerds.reader.view.ChannelListItem>
