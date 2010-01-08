@@ -89,7 +89,6 @@ public class PostListItem extends RelativeLayout {
 			if (mDownEvent) {
 				if (mAllowBatch && touchX < mCheckRight) {
 					mSelected = !mSelected;
-					Log.d(TAG, "Which view: " + mPostId);
 					mAdapter.updateSelected(this, mSelected);
 					handled = true;
 				} else if (touchX > mStarLeft) {
