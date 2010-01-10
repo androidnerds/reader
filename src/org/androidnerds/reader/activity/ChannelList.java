@@ -37,6 +37,7 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 
 import org.androidnerds.reader.R;
@@ -172,20 +173,26 @@ public class ChannelList extends ListActivity {
         }
     }
 
-	public class ChannelListAdapter extends CursorAdapter implements Filterable {
+	final static class ChannelListItemCache {
+		public View chipView;
+		public TextView titleView;
+		public TextView postCount;
+		public TextView lastPostView;
+		public ImageView selectedView;
+	}
+	
+	public class ChannelListAdapter extends ResourceCursorAdapter implements Filterable {
 		
-		private HashMap<Long, ChannelListItem> itemMap;
-		private LayoutInflater mInflater;
         private Drawable mSelectedIconOn;
         private Drawable mSelectedIconOff;
-
+		private Context mContext;
+		
 		private HashSet<Long> mChecked = new HashSet<Long>();
 		
 		public ChannelListAdapter(Context context, Cursor cur) {
-			super(context, cur);
-			itemMap = new HashMap<Long, ChannelListItem>();
+			super(context, R.layout.channel_list_item, cur, false);
 			
-			mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			mContext = context;
 
 			Resources resources = context.getResources();
 	        mSelectedIconOn = resources.getDrawable(R.drawable.btn_check_buttonless_dark_on);
@@ -193,25 +200,40 @@ public class ChannelList extends ListActivity {
 
 		}
 		
-		protected void updateItemMap(Cursor cursor, ChannelListItem item) {
-			long channelId = cursor.getLong(cursor.getColumnIndex(Reader.Channels._ID));
-			
-			itemMap.put(new Long(channelId), item);
-		}
-		
 		public Set<Long> getSelectedSet() {
             return mChecked;
         }
 
 		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View v;
+			Cursor cursor = mCursor;
+			
+			if (!cursor.moveToPosition(position)) {
+				throw new IllegalStateException("could not move to cursor position: " + position);
+			}
+			
+			if (convertView == null) {
+				v = newView(mContext, cursor, parent);
+			} else {
+				v = convertView;
+				ChannelListItem item = (ChannelListItem) v;
+				item.mChannelId = cursor.getLong(cursor.getColumnIndex(Reader.Channels._ID));
+				item.mSelected = mChecked.contains(Long.valueOf(item.mChannelId));
+			}
+			
+			bindView(v, mContext, cursor);
+			return v;
+		}
+		
+		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
+			final ChannelListItemCache cache = (ChannelListItemCache) view.getTag();
 			ChannelListItem item = (ChannelListItem) view;
-			item.bindViewInit(this, true);
 			
 			long channelId = cursor.getLong(cursor.getColumnIndex(Reader.Channels._ID));
 			item.mChannelId = channelId;
-			Log.d(TAG, "Channel ID: " + channelId);
-			Log.d(TAG, "ChannelItem ID: " + item.mChannelId);
+			
 			item.mSelected = mChecked.contains(Long.valueOf(item.mChannelId));
 			
 			ContentResolver resolver = context.getContentResolver();
@@ -255,50 +277,54 @@ public class ChannelList extends ListActivity {
 				}
 			}
 			
-			View chipView = view.findViewById(R.id.chip);
 			int chipResId = mColorChipResIds[0];
-			chipView.setBackgroundResource(chipResId);
+			cache.chipView.setBackgroundResource(chipResId);
 			
-			TextView titleView = (TextView) view.findViewById(R.id.channel_name);
 			String text = cursor.getString(cursor.getColumnIndex(Reader.Channels.TITLE));
-			titleView.setText(text);
+			cache.titleView.setText(text);
 			
-			TextView lastPostView = (TextView) view.findViewById(R.id.channel_last_post);
 			text = "Last post: " + formattedDate;
-			lastPostView.setText(text);
+			cache.lastPostView.setText(text);
 			
-			TextView postCount = (TextView) view.findViewById(R.id.channel_post_count);
-			postCount.setText(new Integer(unreadCount).toString());
+			cache.postCount.setText(new Integer(unreadCount).toString());
 			
 			if (unreadCount == 0) {
-				titleView.setTypeface(Typeface.DEFAULT);
-				lastPostView.setTypeface(Typeface.DEFAULT);
-				postCount.setTypeface(Typeface.DEFAULT);
+				cache.titleView.setTypeface(Typeface.DEFAULT);
+				cache.lastPostView.setTypeface(Typeface.DEFAULT);
+				cache.postCount.setTypeface(Typeface.DEFAULT);
 				view.setBackgroundDrawable(context.getResources().getDrawable(
                         R.drawable.list_item_background_read));
 				chipResId = mColorChipResIds[3];
-				chipView.setBackgroundResource(chipResId);
+				cache.chipView.setBackgroundResource(chipResId);
 			} else {
-				titleView.setTypeface(Typeface.DEFAULT_BOLD);
-				lastPostView.setTypeface(Typeface.DEFAULT_BOLD);
-				postCount.setTypeface(Typeface.DEFAULT_BOLD);
+				cache.titleView.setTypeface(Typeface.DEFAULT_BOLD);
+				cache.lastPostView.setTypeface(Typeface.DEFAULT_BOLD);
+				cache.postCount.setTypeface(Typeface.DEFAULT_BOLD);
 				view.setBackgroundDrawable(context.getResources().getDrawable(
 						R.drawable.list_item_background_unread));
 			}
 			
-			ImageView selectedView = (ImageView) view.findViewById(R.id.selected);
-            selectedView.setImageDrawable(item.mSelected ? mSelectedIconOn : mSelectedIconOff);
-
-			updateItemMap(cursor, item);
+            cache.selectedView.setImageDrawable(item.mSelected ? mSelectedIconOn : mSelectedIconOff);
 		}
 		
 		@Override
 		public View newView(Context context, Cursor cursor, ViewGroup parent) {
-			return mInflater.inflate(R.layout.channel_list_item, parent, false);
-		}
-		
-		public ChannelListItem getViewByItemId(long id) {
-			return itemMap.get(new Long(id));
+			final ChannelListItem view = (ChannelListItem) super.newView(context, cursor, parent);
+			view.bindViewInit(this, true);
+			
+			final ChannelListItemCache cache = new ChannelListItemCache();
+			
+			view.mChannelId = cursor.getLong(cursor.getColumnIndex(Reader.Channels._ID));
+			view.mSelected = mChecked.contains(Long.valueOf(view.mChannelId));
+			
+			cache.chipView = view.findViewById(R.id.chip);
+			cache.titleView = (TextView) view.findViewById(R.id.channel_name);
+			cache.postCount = (TextView) view.findViewById(R.id.channel_post_count);
+			cache.lastPostView = (TextView) view.findViewById(R.id.channel_last_post);
+			cache.selectedView = (ImageView) view.findViewById(R.id.selected);
+			
+			view.setTag(cache);
+			return view;
 		}
 		
 		public void updateSelected(ChannelListItem item, boolean newSelected) {
