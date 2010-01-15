@@ -3,3 +3,5 @@ gen
 *.DS_Store
 *.tmproj
 local.properties
+*.xcodeproj
+build

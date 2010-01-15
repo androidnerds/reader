@@ -36,6 +36,8 @@ public abstract class AccountStore {
 	
 	public abstract void authenticateAccount();
 	
+	public abstract String[] getAccounts(Context context);
+	
 	private static class PreEclairAccount extends AccountStore {
 		
 		private static class Holder {
@@ -48,6 +50,10 @@ public abstract class AccountStore {
 		
 		public void authenticateAccount() {
 			
+		}
+		
+		public String[] getAccounts(Context context) {
+			return new String[] { "mike@androidnerds.org", "michael.novakjr@gmail.com" };
 		}
 		
 	}
@@ -67,6 +73,19 @@ public abstract class AccountStore {
 		
 		public void authenticateAccount() {
 			
+		}
+		
+		public String[] getAccounts(Context context) {
+			AccountManager manager = AccountManager.get(context);
+			Account[] accts = manager.getAccounts();
+			String[] names = new String[accts.length];
+			
+			for (int i = 0; i < accts.length; i++) {
+				Log.d(TAG, "Account: " + accts[i]);
+				names[i] = accts[i].name;
+			}
+			
+			return names;
 		}
 	}
 }
