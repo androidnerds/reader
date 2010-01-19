@@ -33,7 +33,7 @@ public abstract class AccountStore {
 		}
 	}
 	
-	public abstract void getAccountToken(Context context);
+	public abstract void getAccountToken(Context context, String account);
 	
 	public abstract void authenticateAccount();
 	
@@ -45,7 +45,7 @@ public abstract class AccountStore {
 			private static final PreEclairAccount sInstance = new PreEclairAccount();
 		}
 		
-		public void getAccountToken(Context context) {
+		public void getAccountToken(Context context, String account) {
 			Log.d(TAG, "PreEclair token request.");
 		}
 		
@@ -65,7 +65,7 @@ public abstract class AccountStore {
 			private static final EclairAccount sInstance = new EclairAccount();
 		}
 		
-		public void getAccountToken(Context context) {
+		public void getAccountToken(Context context, String account) {
 			AccountManager manager = AccountManager.get(context);
 			Account[] accts = manager.getAccounts();
 

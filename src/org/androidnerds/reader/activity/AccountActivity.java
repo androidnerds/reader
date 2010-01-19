@@ -30,6 +30,7 @@ import android.widget.EditText;
 
 import org.androidnerds.reader.Constants;
 import org.androidnerds.reader.R;
+import org.androidnerds.reader.provider.AccountProvider;
 import org.androidnerds.reader.util.AccountStore;
 import org.androidnerds.reader.util.api.Authentication;
 
@@ -65,12 +66,17 @@ public class AccountActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		
 		AccountStore store = AccountStore.getInstance();
-		store.getAccountToken(this);
+		//store.getAccountToken(this);
 		
 		mAccounts = store.getAccounts(this);
 		mAccount = 0;
 		
-		onCreateDialog(ACCT_LIST);
+		AccountProvider acct = new AccountProvider(this);
+		String user = acct.getMasterAccount();
+		
+		if (user == null) {
+			onCreateDialog(ACCT_LIST);
+		}
 	}
 	
 	protected Dialog onCreateDialog(int id) {
@@ -127,6 +133,9 @@ public class AccountActivity extends Activity {
 	
 	DialogInterface.OnClickListener mAccountListener = new DialogInterface.OnClickListener() {
 	
+		/**
+		 * Here we are going to set the following account as the master for the device.
+		 */
 		public void onClick(DialogInterface dialog, int which) {
 				mAccount = which - 1;
 		}		
