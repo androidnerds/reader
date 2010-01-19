@@ -17,15 +17,21 @@ package org.androidnerds.reader.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 
 import org.androidnerds.reader.Constants;
 import org.androidnerds.reader.R;
 import org.androidnerds.reader.util.AccountStore;
+import org.androidnerds.reader.util.api.Authentication;
 
 /**
  * This activity depends version of Android the user has installed on their phone, pre 2.0 devices
@@ -43,10 +49,16 @@ public class AccountActivity extends Activity {
 	
 	public static final int ACCT_LIST = 1;
 	public static final int SIGN_IN_ACCT = 2;
+	public static final int AUTH_WAIT = 3;
 	
 	private Dialog mDialog;
+	private ProgressDialog mProgressDialog;
+	private EditText mEmailField;
+	private EditText mPassField;
 	private CharSequence[] mAccounts;
 	private int mAccount;
+	private String mEmail;
+	private String mPass;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -72,13 +84,46 @@ public class AccountActivity extends Activity {
 			break;
 		case SIGN_IN_ACCT:
 			builder.setTitle("Sign in to Google Reader");
+				
+			LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+			View v = inflater.inflate(R.layout.auth_dialog, (ViewGroup) findViewById(R.id.layout_root));
+			mEmailField = (EditText) v.findViewById(R.id.google_username);
+			mPassField = (EditText) v.findViewById(R.id.google_password);
+			
+			builder.setView(v);
+			builder.setIcon(android.R.drawable.ic_dialog_alert);
+			builder.setNegativeButton("Cancel", mLoginListener);
+			builder.setPositiveButton("Login", mLoginListener);
+				
 			mDialog = builder.create();	
 			break;
+				
+		case AUTH_WAIT:
+			mProgressDialog = ProgressDialog.show(this, "Please Wait", "Signing In...", true);
+			return mProgressDialog;
 		}
 		
 		mDialog.show();
 		return mDialog;
 	}
+	
+	DialogInterface.OnClickListener mLoginListener = new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int which) {
+			if (which == -2) {
+				close();
+			}
+
+			if (!mEmailField.getText().equals("") && !mPassField.getText().equals("")) {
+				mEmail = mEmailField.getText().toString();
+				mPass = mPassField.getText().toString();
+
+				onCreateDialog(AUTH_WAIT);
+
+				Thread thr = new Thread(authRunner);
+				thr.start();
+			}	
+		}
+	};
 	
 	DialogInterface.OnClickListener mAccountListener = new DialogInterface.OnClickListener() {
 	
@@ -86,6 +131,24 @@ public class AccountActivity extends Activity {
 				mAccount = which - 1;
 		}		
 
+	};
+
+	public void close() {
+		finish();
+	}
+
+	private Runnable authRunner = new Runnable() {
+		public void run() {
+			String authToken = Authentication.getAuthToken(mEmail, mPass);
+			runOnUiThread(updateUi);
+		}
+	};
+
+	private Runnable updateUi = new Runnable() {
+		public void run() {
+			mProgressDialog.dismiss();
+			close();
+		}
 	};
 
 }
