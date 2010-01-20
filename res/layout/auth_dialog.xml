@@ -45,4 +45,10 @@
         android:layout_height="wrap_content"
         />
 		
+	<CheckBox
+		android:id="@+id/remember_me"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Remember me" />
+		
 </LinearLayout>

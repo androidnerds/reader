@@ -20,6 +20,7 @@ import android.content.Context;
 import android.util.Log;
 
 import org.androidnerds.reader.Constants;
+import org.androidnerds.reader.provider.AccountProvider;
 
 public abstract class AccountStore {
 	
@@ -54,7 +55,14 @@ public abstract class AccountStore {
 		}
 		
 		public String[] getAccounts(Context context) {
-			return new String[] { "mike@androidnerds.org", "michael.novakjr@gmail.com" };
+			AccountProvider provider = new AccountProvider(context);
+			String user = provider.getMasterAccount();
+			
+			if (user == null) {
+				return null;
+			} else {
+				return new String[] { user };
+			}
 		}
 		
 	}

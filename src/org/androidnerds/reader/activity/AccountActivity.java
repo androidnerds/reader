@@ -74,7 +74,9 @@ public class AccountActivity extends Activity {
 		AccountProvider acct = new AccountProvider(this);
 		String user = acct.getMasterAccount();
 		
-		if (user == null) {
+		if (mAccounts == null) {
+			onCreateDialog(SIGN_IN_ACCT);
+		} else if (user == null) {
 			onCreateDialog(ACCT_LIST);
 		}
 	}
