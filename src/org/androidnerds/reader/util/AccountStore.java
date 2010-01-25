@@ -16,85 +16,82 @@ package org.androidnerds.reader.util;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 
 import org.androidnerds.reader.Constants;
+import org.androidnerds.reader.activity.AccountActivity;
 import org.androidnerds.reader.provider.AccountProvider;
+import org.androidnerds.reader.util.api.Authentication;
 
 public abstract class AccountStore {
 	
-	private static final String TAG = "AccountStore";
+    private static final String TAG = "AccountStore";
 	
-	public static AccountStore getInstance() {
-		if (Constants.PRE_ECLAIR) {
-			return PreEclairAccount.Holder.sInstance;
-		} else {
-			return EclairAccount.Holder.sInstance;
-		}
+    public static AccountStore getInstance() {
+        if (Constants.PRE_ECLAIR) {
+            return PreEclairAccount.Holder.sInstance;
+        } else {
+            return EclairAccount.Holder.sInstance;
 	}
-	
-	public abstract void getAccountToken(Context context, String account);
-	
-	public abstract void authenticateAccount();
-	
-	public abstract String[] getAccounts(Context context);
-	
-	private static class PreEclairAccount extends AccountStore {
+    }
 		
-		private static class Holder {
-			private static final PreEclairAccount sInstance = new PreEclairAccount();
-		}
+    public abstract String getAccountToken(Context context, String account, String pass);
+	
+    public abstract String[] getAccounts(Context context);
+	
+    private static class PreEclairAccount extends AccountStore {
 		
-		public void getAccountToken(Context context, String account) {
-			Log.d(TAG, "PreEclair token request.");
-		}
+        private static class Holder {
+            private static final PreEclairAccount sInstance = new PreEclairAccount();
+        }
 		
-		public void authenticateAccount() {
+        public String getAccountToken(Context context, String account, String pass) {
+            Log.d(TAG, "PreEclair token request.");
 			
-		}
-		
-		public String[] getAccounts(Context context) {
-			AccountProvider provider = new AccountProvider(context);
-			String user = provider.getMasterAccount();
-			
-			if (user == null) {
-				return null;
-			} else {
-				return new String[] { user };
-			}
-		}
-		
-	}
-	
-	private static class EclairAccount extends AccountStore {
-		
-		private static class Holder {
-			private static final EclairAccount sInstance = new EclairAccount();
-		}
-		
-		public void getAccountToken(Context context, String account) {
-			AccountManager manager = AccountManager.get(context);
-			Account[] accts = manager.getAccounts();
+            return Authentication.getAuthToken(account, pass);
+        }
 
-			Log.d(TAG, "Number of accounts on device: " + accts.length);
-		}
+        public String[] getAccounts(Context context) {
+            AccountProvider provider = new AccountProvider(context);
+            String user = provider.getMasterAccount();
+			
+            if (user == null) {
+                return null;
+            } else {
+                return new String[] { user };
+	    }
+        }
 		
-		public void authenticateAccount() {
-			
-		}
+    }
+	
+    private static class EclairAccount extends AccountStore {
 		
-		public String[] getAccounts(Context context) {
-			AccountManager manager = AccountManager.get(context);
-			Account[] accts = manager.getAccounts();
-			String[] names = new String[accts.length];
+        private static class Holder {
+            private static final EclairAccount sInstance = new EclairAccount();
+        }
+		
+        public String getAccountToken(Context context, String account, String pass) {
+            AccountProvider provider = new AccountProvider(context);
+            String token = provider.getAuthToken(provider.getMasterAccount());
+
+            return token;
+        }
+
+        public String[] getAccounts(Context context) {
+            AccountManager manager = AccountManager.get(context);
+            Account[] accts = manager.getAccountsByType("com.google");
+            String[] names = new String[accts.length];
 			
-			for (int i = 0; i < accts.length; i++) {
-				Log.d(TAG, "Account: " + accts[i]);
-				names[i] = accts[i].name;
-			}
+            for (int i = 0; i < accts.length; i++) {
+                Log.d(TAG, "Account: " + accts[i]);
+                names[i] = accts[i].name;
+            }
 			
-			return names;
-		}
-	}
+            return names;
+        }
+    }
 }

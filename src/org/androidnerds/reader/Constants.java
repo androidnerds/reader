@@ -20,14 +20,19 @@ import org.androidnerds.reader.R;
 
 public interface Constants {
 	
-	/**
-	 * Determine what platform we are working with, if the platform is 2.0 or higher 
-	 * we have the ability to use the internal account manager or whether we need
-	 * to bother the user for authentication.
-	 *
-	 * @note this is supported for api level 4 and higher, level 3 doesn't have
-	 * build information in it
-	 */
-	public static boolean PRE_ECLAIR = (Integer.parseInt(Build.VERSION.SDK) <= 4);
+    /**
+     * Determine what platform we are working with, if the platform is 2.0 or higher 
+     * we have the ability to use the internal account manager or whether we need
+     * to bother the user for authentication.
+     *
+     * @note this is supported for api level 4 and higher, level 3 doesn't have
+     * build information in it
+     */
+    public static boolean PRE_ECLAIR = (Integer.parseInt(Build.VERSION.SDK) <= 4);
+
+    /**
+     * This is the string for referencing the reader app preferences.
+     */
+    public static String PREFS = "reader.prefs";
 	
 }

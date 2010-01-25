@@ -179,6 +179,9 @@ public class AccountProvider extends SQLiteOpenHelper {
 			user = c.getString(0);
 		}
 		
+		
+		c.close();
+		
 		return user;
 	}
 }

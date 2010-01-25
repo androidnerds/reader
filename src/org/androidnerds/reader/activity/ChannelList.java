@@ -41,6 +41,7 @@ import android.widget.ListView;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 
+import org.androidnerds.reader.Constants;
 import org.androidnerds.reader.R;
 import org.androidnerds.reader.provider.Reader;
 import org.androidnerds.reader.view.ChannelListItem;
@@ -133,7 +134,11 @@ public class ChannelList extends ListActivity {
 			startActivity(new Intent(Intent.ACTION_INSERT, getIntent().getData()));
 			return true;
 		case ACCOUNT_ID:
-			startActivity(new Intent(this, AccountActivity.class));
+                        if (Constants.PRE_ECLAIR) {
+			    startActivity(new Intent(this, AccountActivity.class));
+                        } else {
+                            startActivity(new Intent(this, EclairAccountActivity.class));
+                        }
 		}
 		
 		return super.onOptionsItemSelected(item);
